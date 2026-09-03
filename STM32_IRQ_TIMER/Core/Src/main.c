@@ -43,7 +43,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+typedef enum {
+    LED_BLINK_OFF = 0,
+    LED_BLINK_ON = 1
+} led_blink_state_t;
 
+led_blink_state_t led_blink_state = LED_BLINK_OFF;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,8 +99,30 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) 
+    {
+      if (led_blink_state == LED_BLINK_OFF) 
+      {
+        led_blink_state = LED_BLINK_ON;
+      } 
+      else 
+      {
+        led_blink_state = LED_BLINK_OFF;
+      }
+    }
+    else // Button is not pressed
+    {
+      if (led_blink_state == LED_BLINK_ON) 
+      {
+        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+        HAL_Delay(500); // Delay for 500 milliseconds
+      }
+      else 
+      {
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); // Ensure LED is off
+      }
+    }
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
