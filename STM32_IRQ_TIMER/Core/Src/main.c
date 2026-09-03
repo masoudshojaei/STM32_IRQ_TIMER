@@ -129,7 +129,7 @@ int main(void)
       if (led_blink_state == LED_BLINK_ON) 
       {
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-        HAL_Delay(600); // Delay for 50 milliseconds
+        HAL_Delay(500); // Delay for 500 milliseconds
       }
       else 
       {
