@@ -49,7 +49,13 @@ typedef enum {
     LED_BLINK_ON = 1
 } led_blink_state_t;
 
+typedef enum {
+    LED_OFF = 0,
+    LED_ON = 1
+} led_state_t;
+
 led_blink_state_t led_blink_state = LED_BLINK_OFF;
+led_state_t led_state = LED_OFF;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,10 +76,24 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if (led_blink_state == LED_BLINK_OFF) 
   {
     led_blink_state = LED_BLINK_ON;
+    HAL_TIM_Base_Start_IT(&htim2);
   } 
   else 
   {
     led_blink_state = LED_BLINK_OFF;
+    HAL_TIM_Base_Stop_IT(&htim2);
+    __HAL_TIM_SET_COUNTER(&htim2, 0);   // Reset counter to 0
+  }
+}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (led_state == LED_OFF) 
+  {
+    led_state = LED_ON;
+  } 
+  else 
+  {
+    led_state = LED_OFF;
   }
 }
 /* USER CODE END 0 */
@@ -118,11 +138,18 @@ int main(void)
   {
     if (led_blink_state == LED_BLINK_ON) 
     {
-      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-      HAL_Delay(500); // Delay for 500 milliseconds
+      if (led_state == LED_OFF) 
+      {
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); // Turn off LED
+      } 
+      else 
+      {
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET); // Turn on LED
+      }
     }
     else 
     {
+      led_state = LED_OFF;
       HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); // Ensure LED is off
     }
     
