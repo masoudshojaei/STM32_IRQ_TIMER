@@ -66,7 +66,14 @@ void SystemClock_Config(void);
   */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-
+  if (led_blink_state == LED_BLINK_OFF) 
+  {
+    led_blink_state = LED_BLINK_ON;
+  } 
+  else 
+  {
+    led_blink_state = LED_BLINK_OFF;
+  }
 }
 /* USER CODE END 0 */
 
@@ -107,43 +114,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // Check if the button is pressed (active low)
-    if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) 
+    if (led_blink_state == LED_BLINK_ON) 
     {
-      HAL_Delay(10); // Debounce delay
-
-      // Check if the button is still pressed after debounce
-      if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) 
-      {
-        while (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) 
-        {
-          // Wait for button release
-          HAL_Delay(10);
-        }
-      }
-      if (led_blink_state == LED_BLINK_OFF) 
-      {
-        led_blink_state = LED_BLINK_ON;
-      } 
-      else 
-      {
-        led_blink_state = LED_BLINK_OFF;
-      }
+      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+      HAL_Delay(500); // Delay for 500 milliseconds
     }
-
-
-    else // Button is not pressed
+    else 
     {
-      if (led_blink_state == LED_BLINK_ON) 
-      {
-        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-        HAL_Delay(500); // Delay for 500 milliseconds
-      }
-      else 
-      {
-        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); // Ensure LED is off
-      }
+      HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); // Ensure LED is off
     }
+    
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
   }
