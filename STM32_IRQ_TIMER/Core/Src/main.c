@@ -99,8 +99,20 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // Check if the button is pressed (active low)
     if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) 
     {
+      HAL_Delay(10); // Debounce delay
+
+      // Check if the button is still pressed after debounce
+      if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) 
+      {
+        while (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) == GPIO_PIN_RESET) 
+        {
+          // Wait for button release
+          HAL_Delay(10);
+        }
+      }
       if (led_blink_state == LED_BLINK_OFF) 
       {
         led_blink_state = LED_BLINK_ON;
@@ -110,12 +122,14 @@ int main(void)
         led_blink_state = LED_BLINK_OFF;
       }
     }
+
+
     else // Button is not pressed
     {
       if (led_blink_state == LED_BLINK_ON) 
       {
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-        HAL_Delay(500); // Delay for 500 milliseconds
+        HAL_Delay(600); // Delay for 50 milliseconds
       }
       else 
       {
